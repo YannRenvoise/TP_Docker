@@ -1,17 +1,13 @@
-name: CI - Kubernetes Integration Tests
+name: CI - Docker Build & Test
 
 on:
   push:
     branches: [master, develop]
   pull_request:
     branches: [master, develop]
-  workflow_dispatch:
-  
+
 permissions:
   contents: read
-  actions: read
-  security-events: write
-  checks: write
 
 jobs:
   build-and-test:
@@ -22,6 +18,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker images
+      - name: Build Docker image
+        run: docker build -t hello:latest ./hello
+
+      - name: Run container
+        run: docker run -d -p 4000:8080 --name test-container hello:latest
+
+      - name: Wait for app to start
+        run: sleep 10
+
+      - name: Test endpoint
         run: |
-          docker build -t hello:latest ./hello
+          curl -f http://localhost:4000 || exit 1
+
+      - name: Show logs if failure
+        if: failure()
+        run: docker logs test-container
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop test-container
+          docker rm test-container
