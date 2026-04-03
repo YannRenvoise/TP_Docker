@@ -1,0 +1,27 @@
+name: CI - Kubernetes Integration Tests
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+  workflow_dispatch:
+  
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+  checks: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker images
+        run: |
+          docker build -t hello:latest ./hello
