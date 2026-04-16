@@ -1,10 +1,10 @@
-name: CI - Docker Build & Test
+name: CI - Java Tests and Docker
 
 on:
   push:
-    branches: [master, develop]
+    branches: [main, master, develop]
   pull_request:
-    branches: [master, develop]
+    branches: [main, master, develop]
 
 permissions:
   contents: read
@@ -18,25 +18,49 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -t hello:latest ./hello
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
 
-      - name: Run container
-        run: docker run -d -p 4000:8080 --name test-container hello:latest
+      - name: Run Spring tests
+        working-directory: ./projet/MyService
+        run: ./gradlew test jacocoTestReport
+
+      - name: Build rental service Docker image
+        run: docker build -t car-rental-service:latest ./projet/MyService
+
+      - name: Run rental service container
+        run: docker run -d -p 4000:8080 --name rental-service car-rental-service:latest
 
       - name: Wait for app to start
+        run: sleep 15
+
+      - name: Test rental service endpoint
+        run: curl -f http://localhost:4000/api/
+
+      - name: Build hello Docker image
+        run: docker build -t hello:latest ./hello
+
+      - name: Run hello container
+        run: docker run -d -p 4001:8080 --name hello-sample hello:latest
+
+      - name: Wait for hello app
         run: sleep 10
 
-      - name: Test endpoint
-        run: |
-          curl -f http://localhost:4000 || exit 1
+      - name: Test hello endpoint
+        run: curl -f http://localhost:4001
 
       - name: Show logs if failure
         if: failure()
-        run: docker logs test-container
+        run: |
+          docker logs rental-service || true
+          docker logs hello-sample || true
 
       - name: Cleanup
         if: always()
         run: |
-          docker stop test-container
-          docker rm test-container
+          docker stop rental-service hello-sample || true
+          docker rm rental-service hello-sample || true

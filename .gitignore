@@ -1,0 +1,5 @@
+.gradle-cache/
+.DS_Store
+.vscode/
+.idea/vcs.xml
+projet/.github/
