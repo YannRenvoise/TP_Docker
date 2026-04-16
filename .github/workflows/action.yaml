@@ -27,7 +27,9 @@ jobs:
 
       - name: Run Spring tests
         working-directory: ./projet/MyService
-        run: ./gradlew test jacocoTestReport
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test jacocoTestReport
 
       - name: Build rental service Docker image
         run: docker build -t car-rental-service:latest ./projet/MyService
