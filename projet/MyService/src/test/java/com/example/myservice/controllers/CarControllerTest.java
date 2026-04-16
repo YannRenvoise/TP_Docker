@@ -1,7 +1,9 @@
 package com.example.myservice.controllers;
 
 import com.example.myservice.entities.Car;
+import com.example.myservice.services.CarService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,10 +24,14 @@ public class CarControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    @Autowired
+    private CarService carService;
+
     private MockMvc mockMvc;
 
-    @org.junit.jupiter.api.BeforeEach
+    @BeforeEach
     public void setUp() {
+        carService.loadCatalog();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 

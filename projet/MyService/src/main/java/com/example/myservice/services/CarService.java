@@ -15,6 +15,7 @@ public class CarService {
 
     @PostConstruct
     public void loadCatalog() {
+        cars.clear();
         addCar(new Car("AA-101-AA", "Renault", "Clio", 45.0, true));
         addCar(new Car("BB-202-BB", "Peugeot", "208", 52.0, true));
         addCar(new Car("CC-303-CC", "Tesla", "Model 3", 110.0, false));
