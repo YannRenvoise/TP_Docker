@@ -45,8 +45,13 @@ tasks.named('jacocoTestReport') {
 }
 
 sonar {
-  properties {
-    property "sonar.projectKey", "YannRenvoise_TP_Docker"
-    property "sonar.organization", "yannrenvoise"
-  }
+	properties {
+		property 'sonar.gradle.skipCompile', 'true'
+		property 'sonar.projectKey', System.getenv('SONAR_PROJECT_KEY') ?: 'YannRenvoise_TP_Docker'
+		property 'sonar.projectName', System.getenv('SONAR_PROJECT_NAME') ?: 'TP_Docker'
+		property 'sonar.organization', System.getenv('SONAR_ORGANIZATION') ?: 'yannrenvoise'
+		property 'sonar.host.url', System.getenv('SONAR_HOST_URL') ?: 'https://sonarcloud.io'
+		property 'sonar.token', System.getenv('SONAR_TOKEN') ?: ''
+		property 'sonar.coverage.jacoco.xmlReportPaths', layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml').get().asFile.absolutePath
+	}
 }
