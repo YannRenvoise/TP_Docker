@@ -94,6 +94,19 @@ cd C:\dev\tp_docker\projet\MyService
 .\gradlew.bat bootRun
 ```
 
+Si le projet reste dans un chemin Windows avec accent, utiliser le wrapper sécurisé fourni :
+
+```powershell
+cd projet\MyService
+.\gradlew-safe.bat test jacocoTestReport sonar
+```
+
+Ce script :
+
+- force un `GRADLE_USER_HOME` avec chemin ASCII
+- monte temporairement le projet sur un lecteur `X:`, `Y:` ou `Z:`
+- évite les erreurs Gradle de type `ClassNotFoundException` sur les classes de test
+
 ## Docker
 
 Construire l'image du projet principal :
