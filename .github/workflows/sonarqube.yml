@@ -33,14 +33,20 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
       - name: Build and analyze
-        if: ${{ secrets.SONAR_TOKEN != '' }}
         working-directory: ./projet/MyService
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL != '' && secrets.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_PROJECT_NAME: ${{ secrets.SONAR_PROJECT_NAME }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
         run: |
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "SONAR_TOKEN missing. Skip Sonar analysis."
+            exit 0
+          fi
+          if [ -z "$SONAR_HOST_URL" ]; then
+            export SONAR_HOST_URL="https://sonarcloud.io"
+          fi
           chmod +x ./gradlew
           ./gradlew build sonar --info
